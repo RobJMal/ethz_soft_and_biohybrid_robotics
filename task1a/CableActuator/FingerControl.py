@@ -150,20 +150,17 @@ class Vector3:
 
 
 class GoalPositionController(Sofa.Core.Controller):
-    def __init__(self, goal_obj, axis='y', min_theta_range=(-np.pi/4 + np.pi), max_theta_range=(np.pi/4 + np.pi), step=0.1):
+    def __init__(self, goal_obj, min_theta_range=(-np.pi/4), max_theta_range=(np.pi/4), speed=0.01):
         Sofa.Core.Controller.__init__(self)
         self.goal = goal_obj
-        self.axis = axis
         self.min_theta_range = min_theta_range
         self.max_theta_range = max_theta_range
-        self.theta_vals = np.linspace(min_theta_range, max_theta_range, 100)
-        self.step = step
         self.init_position = goal_obj.position.value[0]
         self.goal_controller_position = Vector3(self.init_position[0], self.init_position[1], self.init_position[2])
         self.direction = 1
         self.radius = -120
-        self.theta = np.pi 
-        self.speed = 0.01
+        self.theta = 0.0 
+        self.speed = speed
 
     def onAnimateBeginEvent(self, event):
         self.theta += self.speed * self.direction
