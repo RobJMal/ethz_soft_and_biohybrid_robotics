@@ -122,10 +122,34 @@ def createScene(rootNode):
                        effectorGoal="@../../goal/goalMO.position")
     effector.addObject('BarycentricMapping', mapForces=False, mapMasses=False)
 
-    print("****** Trying to print out the goal states ******")
-    print(goal.goalMO.position.value)
+    print("****** Adding the controller ******")
+    goal.addObject(GoalPositionController(goal.goalMO))
     print("******************")
     return rootNode
+
+
+class GoalPositionController(Sofa.Core.Controller):
+    def __init__(self, goal_obj, axis='y', min_val=0, max_val=14, step=0.1):
+        Sofa.Core.Controller.__init__(self)
+        self.goal = goal_obj
+        self.axis = axis
+        self.min_val = min_val
+        self.max_val = max_val
+        self.step = step
+        self.current_val = goal_obj.position.value[0][1]  # Assuming initial y position
+        self.direction = 1
+    
+    def onAnimateBeginEvent(self, event):
+        if self.axis == 'y':
+            self.current_val += self.step * self.direction
+            
+            if self.current_val > self.max_val or self.current_val < self.min_val:
+                self.direction *= -1
+                self.current_val += self.step * self.direction
+        
+            new_position = list(self.goal.position.value[0])
+            new_position[1] = self.current_val
+            self.goal.position.value = [new_position]
 
 
 # Function used only if this script is called from a python environment
