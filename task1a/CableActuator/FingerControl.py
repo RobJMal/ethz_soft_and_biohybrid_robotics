@@ -9,6 +9,9 @@ import os
 
 path = os.path.dirname(os.path.abspath(__file__)) + '/mesh/'
 
+# For the controller 
+import numpy as np 
+
 
 def main():
         # Call the SOFA function to create the root node
@@ -128,28 +131,71 @@ def createScene(rootNode):
     return rootNode
 
 
+class Vector3:
+    def __init__(self, x=0, y=0, z=0):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def as_list(self):
+        return [self.x, self.y, self.z]
+    
+    def set(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def __repr__(self):
+        return f"Vector3(x={self.x}, y={self.y}, z={self.z})"
+
+
 class GoalPositionController(Sofa.Core.Controller):
-    def __init__(self, goal_obj, axis='y', min_val=0, max_val=14, step=0.1):
+    def __init__(self, goal_obj, axis='y', min_theta_range=-np.pi/4, max_theta_range=np.pi/4, step=0.1):
         Sofa.Core.Controller.__init__(self)
         self.goal = goal_obj
         self.axis = axis
-        self.min_val = min_val
-        self.max_val = max_val
+        self.min_theta_range = min_theta_range
+        self.max_theta_range = max_theta_range
+        self.theta_vals = np.linspace(min_theta_range, max_theta_range, 100)
         self.step = step
-        self.current_val = goal_obj.position.value[0][1]  # Assuming initial y position
+        self.init_position = goal_obj.position.value[0]
+        self.goal_controller_position = Vector3(self.init_position[0], self.init_position[1], self.init_position[2])
         self.direction = 1
-    
+        self.radius = 1
+        self.theta = 0.0 
+        self.speed = 0.01
+
     def onAnimateBeginEvent(self, event):
-        if self.axis == 'y':
-            self.current_val += self.step * self.direction
+        self.theta += self.speed
+
+        if self.theta < self.min_theta_range or self.theta > self.max_theta_range:
+            self.direction *= -1
+            self.theta += self.speed * self.direction
+
+        new_x = self.goal_controller_position.x + self.radius * np.cos(-1 * self.theta + np.pi)
+        new_y = self.goal_controller_position.y + self.radius * np.sin(self.theta + np.pi)
+        new_z = self.goal_controller_position.z
+
+        self.goal_controller_position.set(new_x, new_y, new_z)
+        self.goal.position.value = [self.goal_controller_position.as_list()]
+        print(self.goal_controller_position)
+
+    # def onAnimateBeginEvent(self, event):
+    #     # Moving along circle
+    #     self.goal_controller_position.x = self.radius*np.cos(-)
+
+    #     if self.axis == 'y':
+    #         self.current_val += self.step * self.direction
             
-            if self.current_val > self.max_val or self.current_val < self.min_val:
-                self.direction *= -1
-                self.current_val += self.step * self.direction
+    #         if self.current_val > self.max_val or self.current_val < self.min_val:
+    #             self.direction *= -1
+    #             self.current_val += self.step * self.direction
         
-            new_position = list(self.goal.position.value[0])
-            new_position[1] = self.current_val
-            self.goal.position.value = [new_position]
+    #         new_position = list(self.goal.position.value[0])
+    #         new_position[1] = self.current_val
+    #         self.goal.position.value = [new_position]
+
+
 
 
 # Function used only if this script is called from a python environment
