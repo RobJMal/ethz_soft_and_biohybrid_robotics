@@ -150,7 +150,7 @@ class Vector3:
 
 
 class GoalPositionController(Sofa.Core.Controller):
-    def __init__(self, goal_obj, axis='y', min_theta_range=-np.pi/4, max_theta_range=np.pi/4, step=0.1):
+    def __init__(self, goal_obj, axis='y', min_theta_range=(-np.pi/4 + np.pi), max_theta_range=(np.pi/4 + np.pi), step=0.1):
         Sofa.Core.Controller.__init__(self)
         self.goal = goal_obj
         self.axis = axis
@@ -161,42 +161,26 @@ class GoalPositionController(Sofa.Core.Controller):
         self.init_position = goal_obj.position.value[0]
         self.goal_controller_position = Vector3(self.init_position[0], self.init_position[1], self.init_position[2])
         self.direction = 1
-        self.radius = 1
-        self.theta = 0.0 
+        self.radius = -120
+        self.theta = np.pi 
         self.speed = 0.01
 
     def onAnimateBeginEvent(self, event):
-        self.theta += self.speed
+        self.theta += self.speed * self.direction
 
         if self.theta < self.min_theta_range or self.theta > self.max_theta_range:
+            print("Happning!")
             self.direction *= -1
             self.theta += self.speed * self.direction
 
-        new_x = self.goal_controller_position.x + self.radius * np.cos(-1 * self.theta + np.pi)
-        new_y = self.goal_controller_position.y + self.radius * np.sin(self.theta + np.pi)
-        new_z = self.goal_controller_position.z
+        new_x = self.init_position[0] + self.radius * np.cos(self.theta)
+        new_y = self.init_position[1] + self.radius * np.sin(self.theta)
+        new_z = self.init_position[2]
 
         self.goal_controller_position.set(new_x, new_y, new_z)
         self.goal.position.value = [self.goal_controller_position.as_list()]
-        print(self.goal_controller_position)
-
-    # def onAnimateBeginEvent(self, event):
-    #     # Moving along circle
-    #     self.goal_controller_position.x = self.radius*np.cos(-)
-
-    #     if self.axis == 'y':
-    #         self.current_val += self.step * self.direction
-            
-    #         if self.current_val > self.max_val or self.current_val < self.min_val:
-    #             self.direction *= -1
-    #             self.current_val += self.step * self.direction
-        
-    #         new_position = list(self.goal.position.value[0])
-    #         new_position[1] = self.current_val
-    #         self.goal.position.value = [new_position]
-
-
-
+        print("Theta: ", self.theta)
+        print("Goal position: ", self.goal_controller_position)
 
 # Function used only if this script is called from a python environment
 if __name__ == '__main__':
