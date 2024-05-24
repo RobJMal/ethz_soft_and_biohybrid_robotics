@@ -31,11 +31,6 @@ def main():
         print("Closed GUI")
 
 
-# # Same createScene function as in the previous case
-# def createScene(rootNode):
-#         #Doesn't do anything yet
-#         return rootNode
-
 def createScene(rootNode):
     rootNode.addObject('RequiredPlugin',
                        pluginName='SoftRobots SoftRobots.Inverse')
