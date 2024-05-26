@@ -137,7 +137,25 @@ def createScene(rootNode):
     finger1Visu.addObject('BarycentricMapping')
 
     cable1 = finger1.addChild('cable')
-    cable1.addObject('MechanicalObject', position=default_cable_position)
+    cable1.addObject('MechanicalObject', 
+                     position=[
+                        [-17.5, 12.5, 2.5],
+                        [-32.5, 12.5, 2.5],
+                        [-47.5, 12.5, 2.5],
+                        [-62.5, 12.5, 2.5],
+                        [-77.5, 12.5, 2.5],
+
+                        [-83.5, 12.5, 4.5],
+                        [-85.5, 12.5, 6.5],
+                        [-85.5, 12.5, 8.5],
+                        [-83.5, 12.5, 10.5],
+
+                        [-77.5, 12.5, 12.5],
+                        [-62.5, 12.5, 12.5],
+                        [-47.5, 12.5, 12.5],
+                        [-32.5, 12.5, 12.5],
+                        [-17.5, 12.5, 12.5]
+                    ])
     cable1.addObject('CableActuator', name="aCable", indices=list(range(0, 14)), pullPoint=[0.0, 12.5, 2.5], maxPositiveDisp=40, maxDispVariation=0.5, minForce=0)
     cable1.addObject('BarycentricMapping')
 
@@ -174,7 +192,25 @@ def createScene(rootNode):
     finger2Visu.addObject('BarycentricMapping')
 
     cable2 = finger2.addChild('cable2')
-    cable2.addObject('MechanicalObject', position=cable_2_position)
+    cable2.addObject('MechanicalObject', 
+                     position=[
+                        [-17.5, 12.5, 2.5],
+                        [-32.5, 12.5, 2.5],
+                        [-47.5, 12.5, 2.5],
+                        [-62.5, 12.5, 2.5],
+                        [-77.5, 12.5, 2.5],
+
+                        [-83.5, 12.5, 4.5],
+                        [-85.5, 12.5, 6.5],
+                        [-85.5, 12.5, 8.5],
+                        [-83.5, 12.5, 10.5],
+
+                        [-77.5, 12.5, 12.5],
+                        [-62.5, 12.5, 12.5],
+                        [-47.5, 12.5, 12.5],
+                        [-32.5, 12.5, 12.5],
+                        [-17.5, 12.5, 12.5]
+                    ])
     cable2.addObject('CableActuator', name="aCable2", indices=list(range(0, 14)), pullPoint=[0.0, 12.5, 2.5], maxPositiveDisp=40, maxDispVariation=0.5, minForce=0)
     cable2.addObject('BarycentricMapping')
 
