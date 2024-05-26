@@ -180,8 +180,6 @@ class GoalPositionController(Sofa.Core.Controller):
             self.direction *= -1
             self.new_y += self.step * self.direction
 
-        print(f"x: {self.new_x}, y: {self.new_y}, z: {self.new_z}")
-
         self.goal_controller_position.set(self.new_x, self.new_y, self.new_z)
         self.goal.position.value = [self.goal_controller_position.as_list()]
 
