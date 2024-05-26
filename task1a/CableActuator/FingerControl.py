@@ -125,9 +125,8 @@ def createScene(rootNode):
                        effectorGoal="@../../goal/goalMO.position")
     effector.addObject('BarycentricMapping', mapForces=False, mapMasses=False)
 
-    print("****** Adding the controller ******")
     goal.addObject(GoalPositionController(goal.goalMO))
-    print("******************")
+
     return rootNode
 
 
@@ -150,34 +149,41 @@ class Vector3:
 
 
 class GoalPositionController(Sofa.Core.Controller):
-    def __init__(self, goal_obj, min_theta_range=(-np.pi/4), max_theta_range=(np.pi/4), speed=0.01):
+    def __init__(self, goal_obj, min_range=0.0, max_range=14.0, step=0.1):
         Sofa.Core.Controller.__init__(self)
         self.goal = goal_obj
-        self.min_theta_range = min_theta_range
-        self.max_theta_range = max_theta_range
-        self.init_position = goal_obj.position.value[0]
-        self.goal_controller_position = Vector3(self.init_position[0], self.init_position[1], self.init_position[2])
+        self.min_range = min_range
+        self.max_range = max_range
+
+        self.init_position = Vector3(x = goal_obj.position.value[0][0],
+                                     y = goal_obj.position.value[0][1],
+                                     z = goal_obj.position.value[0][2])
+        
+        self.goal_controller_position = Vector3(x = self.init_position.x, 
+                                                y = self.init_position.y, 
+                                                z = self.init_position.z)
         self.direction = 1
-        self.radius = -120
-        self.theta = 0.0 
-        self.speed = speed
+        self.step = step
+
+        self.new_x = self.init_position.x # + self.radius * np.cos(self.theta)
+        self.new_y = self.init_position.y
+        self.new_z = self.init_position.z
+
+        print("Creating object")
 
     def onAnimateBeginEvent(self, event):
-        self.theta += self.speed * self.direction
+        self.new_x = self.init_position.x # + self.radius * np.cos(self.theta)
+        self.new_y += self.step * self.direction
+        self.new_z = self.init_position.z
 
-        if self.theta < self.min_theta_range or self.theta > self.max_theta_range:
-            print("Happning!")
+        if self.new_y > self.max_range or self.new_y < self.min_range:
             self.direction *= -1
-            self.theta += self.speed * self.direction
+            self.new_y += self.step * self.direction
 
-        new_x = self.init_position[0] + self.radius * np.cos(self.theta)
-        new_y = self.init_position[1] + self.radius * np.sin(self.theta)
-        new_z = self.init_position[2]
+        print(f"x: {self.new_x}, y: {self.new_y}, z: {self.new_z}")
 
-        self.goal_controller_position.set(new_x, new_y, new_z)
+        self.goal_controller_position.set(self.new_x, self.new_y, self.new_z)
         self.goal.position.value = [self.goal_controller_position.as_list()]
-        print("Theta: ", self.theta)
-        print("Goal position: ", self.goal_controller_position)
 
 # Function used only if this script is called from a python environment
 if __name__ == '__main__':
