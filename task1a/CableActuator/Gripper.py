@@ -66,6 +66,25 @@ def createScene(rootNode):
                          [-32.5, 12.5, 12.5], 
                          [-17.5, 12.5, 12.5]
                         ]
+    
+    cable_2_position = [
+                         [-17.5, 12.5, 2.5], 
+                         [-32.5, 12.5, 2.5], 
+                         [-47.5, 12.5, 2.5], 
+                         [-62.5, 12.5, 2.5], 
+                         [-77.5, 12.5, 2.5], 
+
+                         [-83.5, 12.5, 4.5], 
+                         [-85.5, 12.5, 6.5], 
+                         [-85.5, 12.5, 8.5], 
+                         [-83.5, 12.5, 10.5], 
+
+                         [-77.5, 12.5, 12.5], 
+                         [-62.5, 12.5, 12.5], 
+                         [-47.5, 12.5, 12.5], 
+                         [-32.5, 12.5, 12.5], 
+                         [-17.5, 12.5, 12.5]
+                        ]
 
     def calculate_rotated_matrix(points_matrix, theta=0.0, axis='y'): 
         '''
@@ -142,7 +161,7 @@ def createScene(rootNode):
     finger2.addObject('SparseLDLSolver', template="CompressedRowSparseMatrixMat3x3d")
     finger2.addObject('MeshVTKLoader', name='loader', filename=path + 'finger.vtk')
     finger2.addObject('MeshTopology', src='@loader', name='container')
-    finger2.addObject('MechanicalObject', rotation2=[0.0, 0.0, 0.0])  # Adjust position and rotation
+    finger2.addObject('MechanicalObject', rotation2=[0.0, 45.0, 0.0])  # Adjust position and rotation
     finger2.addObject('UniformMass', totalMass=0.075)
     finger2.addObject('TetrahedronFEMForceField', poissonRatio=0.3, youngModulus=600)
     finger2.addObject('BoxROI', name='ROI2', box=[-15, 0, 0, 5, 10, 15], drawBoxes=True)
@@ -155,7 +174,7 @@ def createScene(rootNode):
     finger2Visu.addObject('BarycentricMapping')
 
     cable2 = finger2.addChild('cable2')
-    cable2.addObject('MechanicalObject', position=cable2_position)
+    cable2.addObject('MechanicalObject', position=cable_2_position)
     cable2.addObject('CableActuator', name="aCable2", indices=list(range(0, 14)), pullPoint=[0.0, 12.5, 2.5], maxPositiveDisp=40, maxDispVariation=0.5, minForce=0)
     cable2.addObject('BarycentricMapping')
 
