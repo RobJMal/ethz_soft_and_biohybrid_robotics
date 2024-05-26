@@ -171,7 +171,7 @@ class GoalPositionController(Sofa.Core.Controller):
 
         print("Creating object")
 
-    def onAnimateBeginEvent(self, event):
+    def onEvent(self, event):
         self.new_x = self.init_position.x # + self.radius * np.cos(self.theta)
         self.new_y += self.step * self.direction
         self.new_z = self.init_position.z
