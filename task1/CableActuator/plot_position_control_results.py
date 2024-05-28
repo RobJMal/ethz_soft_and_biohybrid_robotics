@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.metrics import mean_absolute_error
 
 # Processing the data from the file 
-data = pd.read_csv("positions_freq0-005.csv")
+data = pd.read_csv("positions_freq0-002.csv")
 data.columns = data.columns.str.strip() # Removing spacing characters 
 goal_positions = data[['Goal_Position_X', 'Goal_Position_Y']]
 end_effector_positions = data[['Effector_Position_X', 'Effector_Position_Y']]
@@ -31,5 +31,5 @@ plt.xlabel('Timestep')
 plt.ylabel('Y Position [mm]')
 plt.legend()
 
-plt.suptitle('Goal vs Effector Positions (Frequency = 0.005)')
+plt.suptitle('Goal vs Effector Positions (Frequency = 0.002)')
 plt.show()
