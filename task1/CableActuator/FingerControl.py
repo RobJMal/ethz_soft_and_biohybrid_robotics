@@ -119,14 +119,15 @@ def createScene(rootNode):
     # Effector                               #
     ##########################################
     effector = finger.addChild('fingertip')
-    effector.addObject('MechanicalObject', position=([-103, 7, 7]))
+    effector.addObject('MechanicalObject', name='effectorMO',
+                       position=([-103, 7, 7]))
     effector.addObject('PositionEffector', template='Vec3',
                        indices=0,
                        effectorGoal="@../../goal/goalMO.position")
     effector.addObject('BarycentricMapping', mapForces=False, mapMasses=False)
 
     # goal.addObject(GoalPositionController(goal.goalMO))
-    controller = GoalPositionController(goal.goalMO)
+    controller = GoalPositionController(goal.goalMO, effector.effectorMO)
     rootNode.addObject(controller)
 
     return rootNode
@@ -151,9 +152,10 @@ class Vector3:
 
 
 class GoalPositionController(Sofa.Core.Controller):
-    def __init__(self, goal_obj, *args, **kwargs):
+    def __init__(self, goal_obj, end_effector_obj, *args, **kwargs):
         Sofa.Core.Controller.__init__(self, *args, **kwargs)
         self.goal = goal_obj
+        self.end_effector = end_effector_obj
         theta_min_range=(-np.pi/12) 
         theta_max_range=(np.pi/3)
         frequency=0.001
@@ -175,6 +177,10 @@ class GoalPositionController(Sofa.Core.Controller):
         self.frequency = frequency
         self.radius = 103   # This is the length of the actuator (along the x direction)
 
+        # For recording data
+        self.is_recording = False
+        self.recording_file = None
+
     def onAnimateBeginEvent(self, event):
         self.theta += self.frequency
 
@@ -189,6 +195,9 @@ class GoalPositionController(Sofa.Core.Controller):
         self.goal_controller_position.set(self.new_x, self.new_y, self.new_z)
         self.goal.position.value = [self.goal_controller_position.as_list()]
 
+        if self.is_recording:
+            self.record_positions()
+
     def onKeypressedEvent(self, event):
         '''
         Controls the speed of the robot. 
@@ -198,7 +207,6 @@ class GoalPositionController(Sofa.Core.Controller):
         key = event['key']
 
         if ord(key) == 19:  # up
-            
             if self.frequency >= 0.0:
                 self.frequency += 0.001
             elif self.frequency < 0.0:
@@ -207,7 +215,6 @@ class GoalPositionController(Sofa.Core.Controller):
             print(f"Increasing frequency to {self.frequency}")
 
         if ord(key) == 21:  # down
-
             if self.frequency >= 0.0:
                 self.frequency -= 0.001
             elif self.frequency < 0.0:
@@ -215,6 +222,29 @@ class GoalPositionController(Sofa.Core.Controller):
             
             print(f"Decreasing frequency to {self.frequency}")
 
+        if ord(key) == ord("["):
+            if not(self.is_recording):
+                self.recording_file = open("positions.csv", "w")
+                self.is_recording = True
+                self.recording_file.write("Goal_Position_X, Goal_Position_Y, Goal_Position_Z, Effector_Position_X, Effector_Position_Y, Effector_Position_Z\n")  # Header for the file
+                print("Recording data...")
+        
+        if ord(key) == ord("]"):
+            if self.is_recording:
+                self.recording_file.close()
+                self.is_recording = False
+                print("Stopped recording.")
+
+    def record_positions(self):
+        '''
+        Records the positions of the end effector and the goal. 
+        '''
+        if self.recording_file:
+            goal_position = self.goal.position.value[0]
+            end_effector_position = self.end_effector.position.value[0]
+            goal_position_str = f"{goal_position[0]}, {goal_position[1]}, {goal_position[2]}"
+            end_effector_position_str = f"{end_effector_position[0]}, {end_effector_position[1]}, {end_effector_position[2]}"
+            self.recording_file.write(f"{goal_position_str}, {end_effector_position_str}\n")
         
 # Function used only if this script is called from a python environment
 if __name__ == '__main__':
