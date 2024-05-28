@@ -5,6 +5,13 @@ import Sofa.Core
 import Sofa.constants.Key as Key
 import Sofa.Simulation
 
+# Helps program find stlib3 packages 
+import sys
+stlib3_path = '/home/robjmal/SOFA/v23.12.01/plugins/STLIB/lib/python3/site-packages'
+sys.path.append(stlib3_path)
+softrobots_path = '/home/robjmal/SOFA/v23.12.01/plugins/SoftRobots/lib/python3/site-packages'
+sys.path.append(softrobots_path)
+
 from stlib3.scene import MainHeader, ContactHeader
 from stlib3.physics.rigid import Floor, Cube
 
