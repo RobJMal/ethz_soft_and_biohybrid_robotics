@@ -170,23 +170,36 @@ class GoalPositionController(Sofa.Core.Controller):
         self.new_y = self.init_position.y
         self.new_z = self.init_position.z
 
-        print("Creating object")
+        self.theta = 0.0 
+        self.theta_min_range, self.theta_max_range = (-np.pi), (np.pi)
+        self.ang_vel = 0.01
+
+        self.x_amplitude = 10.0
+
 
     def onEvent(self, event):
-        # self.new_x = self.init_position.x # + self.radius * np.cos(self.theta)
-        self.new_x += self.step * self.direction
-        self.new_y += self.step * self.direction
-        # self.new_y = self.init_position.y
+        self.theta += self.ang_vel
+        self.new_x = (self.init_position.x + self.x_amplitude) + -1 * self.x_amplitude * np.cos(self.theta)
+        # self.new_x = (self.init_position.x) + (-103) * np.cos(self.theta + (-1*np.pi/2))
+        # self.new_x += self.step * self.direction
+        
+        self.new_y = self.init_position.y
+        # self.new_y += self.step * self.direction
+
         self.new_z = self.init_position.z
 
-        if abs(self.new_x) >= abs(self.x_max_range) or abs(self.new_x) <= abs(self.x_min_range):
-            self.direction *= -1
-            self.new_x += self.step * self.direction
+        if self.theta >= self.theta_max_range or self.theta <= self.theta_min_range:
+            self.ang_vel *= -1
 
-        if self.new_y >= self.y_max_range or self.new_y <= self.y_min_range:
-            self.direction *= -1
-            self.new_y += self.step * self.direction
+        # if abs(self.new_x) >= abs(self.x_max_range) or abs(self.new_x) <= abs(self.x_min_range):
+        #     self.direction *= -1
+        #     self.new_x += self.step * self.direction
 
+        # if self.new_y >= self.y_max_range or self.new_y <= self.y_min_range:
+        #     self.direction *= -1
+        #     self.new_y += self.step * self.direction
+
+        print(f"theta: {self.theta}")
         print(f"x: {self.new_x}, y: {self.new_y}")
 
         self.goal_controller_position.set(self.new_x, self.new_y, self.new_z)
