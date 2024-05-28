@@ -111,7 +111,7 @@ def createScene(rootNode):
     goal.addObject('EulerImplicitSolver', firstOrder=True)
     goal.addObject('CGLinearSolver', iterations=100, tolerance=1e-5, threshold=1e-5)
     goal.addObject('MechanicalObject', name='goalMO',
-                   position=[-120, 7, 7])
+                   position=[-103, 7, 7])
     goal.addObject('SphereCollisionModel', radius=5)
     goal.addObject('UncoupledConstraintCorrection')
 
@@ -149,11 +149,12 @@ class Vector3:
 
 
 class GoalPositionController(Sofa.Core.Controller):
-    def __init__(self, goal_obj, min_range=0.0, max_range=14.0, step=0.1):
+    def __init__(self, goal_obj, min_range=0.0, max_range=14.0, step=0.01):
         Sofa.Core.Controller.__init__(self)
         self.goal = goal_obj
-        self.min_range = min_range
-        self.max_range = max_range
+
+        self.x_min_range, self.x_max_range = -93.0, -104.0
+        self.y_min_range, self.y_max_range = -3.5, 17.5
 
         self.init_position = Vector3(x = goal_obj.position.value[0][0],
                                      y = goal_obj.position.value[0][1],
@@ -165,20 +166,28 @@ class GoalPositionController(Sofa.Core.Controller):
         self.direction = 1
         self.step = step
 
-        self.new_x = self.init_position.x # + self.radius * np.cos(self.theta)
+        self.new_x = self.init_position.x
         self.new_y = self.init_position.y
         self.new_z = self.init_position.z
 
         print("Creating object")
 
     def onEvent(self, event):
-        self.new_x = self.init_position.x # + self.radius * np.cos(self.theta)
+        # self.new_x = self.init_position.x # + self.radius * np.cos(self.theta)
+        self.new_x += self.step * self.direction
         self.new_y += self.step * self.direction
+        # self.new_y = self.init_position.y
         self.new_z = self.init_position.z
 
-        if self.new_y > self.max_range or self.new_y < self.min_range:
+        if abs(self.new_x) >= abs(self.x_max_range) or abs(self.new_x) <= abs(self.x_min_range):
+            self.direction *= -1
+            self.new_x += self.step * self.direction
+
+        if self.new_y >= self.y_max_range or self.new_y <= self.y_min_range:
             self.direction *= -1
             self.new_y += self.step * self.direction
+
+        print(f"x: {self.new_x}, y: {self.new_y}")
 
         self.goal_controller_position.set(self.new_x, self.new_y, self.new_z)
         self.goal.position.value = [self.goal_controller_position.as_list()]
