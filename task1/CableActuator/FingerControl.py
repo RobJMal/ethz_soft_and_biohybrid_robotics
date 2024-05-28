@@ -196,15 +196,26 @@ class GoalPositionController(Sofa.Core.Controller):
         Note that you must press CTRL + the key. 
         '''
         key = event['key']
+
         if ord(key) == 19:  # up
-            self.frequency += 0.001
+            
+            if self.frequency >= 0.0:
+                self.frequency += 0.001
+            elif self.frequency < 0.0:
+                self.frequency -= 0.001
+
             print(f"Increasing frequency to {self.frequency}")
 
         if ord(key) == 21:  # down
-            self.frequency -= 0.001
+
+            if self.frequency >= 0.0:
+                self.frequency -= 0.001
+            elif self.frequency < 0.0:
+                self.frequency += 0.001
+            
             print(f"Decreasing frequency to {self.frequency}")
 
-
+        
 # Function used only if this script is called from a python environment
 if __name__ == '__main__':
     main()
