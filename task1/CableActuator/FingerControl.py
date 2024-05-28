@@ -2,16 +2,15 @@
 import Sofa
 import Sofa.Core
 import Sofa.Simulation
+import SofaRuntime
 import Sofa.Gui
-import Sofa.constants.Key as Key
+from Sofa.constants import *
 
 # -*- coding: utf-8 -*-
 import os
-
 path = os.path.dirname(os.path.abspath(__file__)) + '/mesh/'
 
-# For the controller 
-import numpy as np 
+import numpy as np      # For the controller 
 
 
 def main():
@@ -126,7 +125,9 @@ def createScene(rootNode):
                        effectorGoal="@../../goal/goalMO.position")
     effector.addObject('BarycentricMapping', mapForces=False, mapMasses=False)
 
-    goal.addObject(GoalPositionController(goal.goalMO))
+    # goal.addObject(GoalPositionController(goal.goalMO))
+    controller = GoalPositionController(goal.goalMO)
+    rootNode.addObject(controller)
 
     return rootNode
 
@@ -150,9 +151,12 @@ class Vector3:
 
 
 class GoalPositionController(Sofa.Core.Controller):
-    def __init__(self, goal_obj, theta_min_range=(-np.pi/8), theta_max_range=(np.pi/3), frequency=0.001):
-        Sofa.Core.Controller.__init__(self)
+    def __init__(self, goal_obj, *args, **kwargs):
+        Sofa.Core.Controller.__init__(self, *args, **kwargs)
         self.goal = goal_obj
+        theta_min_range=(-np.pi/12) 
+        theta_max_range=(np.pi/3)
+        frequency=0.001
 
         self.init_position = Vector3(x = goal_obj.position.value[0][0],
                                      y = goal_obj.position.value[0][1],
@@ -171,7 +175,7 @@ class GoalPositionController(Sofa.Core.Controller):
         self.frequency = frequency
         self.radius = 103   # This is the length of the actuator (along the x direction)
 
-    def onEvent(self, event):
+    def onAnimateBeginEvent(self, event):
         self.theta += self.frequency
 
         self.new_x = -1 * self.radius * np.cos(self.theta)
@@ -184,6 +188,22 @@ class GoalPositionController(Sofa.Core.Controller):
 
         self.goal_controller_position.set(self.new_x, self.new_y, self.new_z)
         self.goal.position.value = [self.goal_controller_position.as_list()]
+
+    def onKeypressedEvent(self, event):
+        '''
+        Controls the speed of the robot. 
+
+        Note that you must press CTRL + the key. 
+        '''
+        key = event['key']
+        if ord(key) == 19:  # up
+            self.frequency += 0.001
+            print(f"Increasing frequency to {self.frequency}")
+
+        if ord(key) == 21:  # down
+            self.frequency -= 0.001
+            print(f"Decreasing frequency to {self.frequency}")
+
 
 # Function used only if this script is called from a python environment
 if __name__ == '__main__':
