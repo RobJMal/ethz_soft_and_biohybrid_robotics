@@ -3,6 +3,7 @@ import Sofa
 import Sofa.Core
 import Sofa.Simulation
 import Sofa.Gui
+import Sofa.constants.Key as Key
 
 # -*- coding: utf-8 -*-
 import os
@@ -149,62 +150,37 @@ class Vector3:
 
 
 class GoalPositionController(Sofa.Core.Controller):
-    def __init__(self, goal_obj, min_range=0.0, max_range=14.0, step=0.01):
+    def __init__(self, goal_obj, theta_min_range=(-np.pi/8), theta_max_range=(np.pi/3), frequency=0.001):
         Sofa.Core.Controller.__init__(self)
         self.goal = goal_obj
-
-        self.x_min_range, self.x_max_range = -93.0, -104.0
-        self.y_min_range, self.y_max_range = -3.5, 17.5
 
         self.init_position = Vector3(x = goal_obj.position.value[0][0],
                                      y = goal_obj.position.value[0][1],
                                      z = goal_obj.position.value[0][2])
-        
         self.goal_controller_position = Vector3(x = self.init_position.x, 
                                                 y = self.init_position.y, 
                                                 z = self.init_position.z)
-        self.direction = 1
-        self.step = step
 
+        # For storing the updated position values 
         self.new_x = self.init_position.x
         self.new_y = self.init_position.y
         self.new_z = self.init_position.z
 
         self.theta = 0.0 
-        self.theta_min_range, self.theta_max_range = (-np.pi/8), (np.pi/3)
-        self.ang_vel = 0.001
-
-        self.x_amplitude = 10.0
-        self.y_amplitude = 10.0
-        self.radius = 103
+        self.theta_min_range, self.theta_max_range = theta_min_range, theta_max_range
+        self.frequency = frequency
+        self.radius = 103   # This is the length of the actuator (along the x direction)
 
     def onEvent(self, event):
-        self.theta += self.ang_vel
+        self.theta += self.frequency
 
-        # self.new_x = (self.init_position.x + self.x_amplitude) + -1 * self.x_amplitude * np.cos(self.theta)
         self.new_x = -1 * self.radius * np.cos(self.theta)
-        # self.new_x = (self.init_position.x) + (-103) * np.cos(self.theta + (-1*np.pi/2))
-        # self.new_x += self.step * self.direction
-        
-        # self.new_y = self.init_position.y + (self.y_amplitude * np.sin(self.theta))
         self.new_y = self.radius * np.sin(self.theta)
-        # self.new_y += self.step * self.direction
-
         self.new_z = self.init_position.z
 
+        # Changing direction after hitting limits 
         if self.theta >= self.theta_max_range or self.theta <= self.theta_min_range:
-            self.ang_vel *= -1
-
-        # if abs(self.new_x) >= abs(self.x_max_range) or abs(self.new_x) <= abs(self.x_min_range):
-        #     self.direction *= -1
-        #     self.new_x += self.step * self.direction
-
-        # if self.new_y >= self.y_max_range or self.new_y <= self.y_min_range:
-        #     self.direction *= -1
-        #     self.new_y += self.step * self.direction
-
-        print(f"theta: {self.theta}")
-        print(f"x: {self.new_x}, y: {self.new_y}")
+            self.frequency *= -1
 
         self.goal_controller_position.set(self.new_x, self.new_y, self.new_z)
         self.goal.position.value = [self.goal_controller_position.as_list()]
