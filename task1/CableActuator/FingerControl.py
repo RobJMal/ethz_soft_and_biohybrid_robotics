@@ -171,19 +171,23 @@ class GoalPositionController(Sofa.Core.Controller):
         self.new_z = self.init_position.z
 
         self.theta = 0.0 
-        self.theta_min_range, self.theta_max_range = (-np.pi), (np.pi)
-        self.ang_vel = 0.01
+        self.theta_min_range, self.theta_max_range = (-np.pi/8), (np.pi/3)
+        self.ang_vel = 0.001
 
         self.x_amplitude = 10.0
         self.y_amplitude = 10.0
+        self.radius = 103
 
     def onEvent(self, event):
         self.theta += self.ang_vel
-        self.new_x = (self.init_position.x + self.x_amplitude) + -1 * self.x_amplitude * np.cos(self.theta)
+
+        # self.new_x = (self.init_position.x + self.x_amplitude) + -1 * self.x_amplitude * np.cos(self.theta)
+        self.new_x = -1 * self.radius * np.cos(self.theta)
         # self.new_x = (self.init_position.x) + (-103) * np.cos(self.theta + (-1*np.pi/2))
         # self.new_x += self.step * self.direction
         
-        self.new_y = self.init_position.y + (self.y_amplitude * np.sin(self.theta))
+        # self.new_y = self.init_position.y + (self.y_amplitude * np.sin(self.theta))
+        self.new_y = self.radius * np.sin(self.theta)
         # self.new_y += self.step * self.direction
 
         self.new_z = self.init_position.z
