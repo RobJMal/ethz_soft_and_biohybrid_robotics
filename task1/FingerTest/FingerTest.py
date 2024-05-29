@@ -22,9 +22,50 @@ from stlib3.physics.collision import CollisionMesh
 from splib3.loaders import loadPointListFromFile
 
 
+# Helper functions for transforming points
+def rotation_matrix_x(theta):
+    return np.array([
+        [1, 0, 0],
+        [0, np.cos(theta), -np.sin(theta)],
+        [0, np.sin(theta), np.cos(theta)]
+    ])
+
+def rotation_matrix_y(theta):
+    return np.array([
+        [np.cos(theta), 0, np.sin(theta)],
+        [0, 1, 0],
+        [-np.sin(theta), 0, np.cos(theta)]
+    ])
+
+def rotation_matrix_z(theta):
+    return np.array([
+        [np.cos(theta), -np.sin(theta)],
+        [np.sin(theta), np.cos(theta)],
+        [0, 0, 1]
+    ])
+    
+def calculate_full_rotation(rx, ry, rz):
+    return np.dot(np.dot(rotation_matrix_x(rx), rotation_matrix_y(ry)), rotation_matrix_z(rz))
+
 def transform_points(points, rotation, translation):
     #TODO: Write a function to transform points using the rotation and translation parameters.
-    transformed_points = points  # Replace this line
+    '''
+    Transform points using the rotation and translation parameters. 
+    '''
+    rotation_angle_x, rotation_angle_y, rotation_angle_z = rotation[0], rotation[1], rotation[2]
+    translation_x, translation_y, translation_z = translation[0], translation[1], translation[2]
+
+    rotation_matrix = calculate_full_rotation(rotation_angle_x, rotation_angle_y, rotation_angle_z)
+
+    transformed_points = []
+
+    for _, point in enumerate(points):
+        point_nparray = np.array(point)
+
+        # Apply transformation 
+        transformed_point = np.dot(rotation_matrix, point) + np.array(translation)
+        transformed_points.append(transformed_point.to_list())
+
     return transformed_points
 
 
@@ -106,14 +147,16 @@ class GripperController(Sofa.Core.Controller):
 
 def createGripper(name, parentNode):
     fingers = []
+
     for i in range(3):
         fingerName = f"{name}-finger{i}"
         # Create a finger here
-        
+        finger_rotation_y = i*120.0
+
         # Here's how you can create a single finger
         fingers.append(createFinger("fingerName",
                     parentNode=parentNode,
-                    rotation=[0.0, 0.0, 0.0],
+                    rotation=[0.0, finger_rotation_y, 0.0],
                     translation=[0.0, 0.0, 0.0],
                     boxCoords=[[-5.0, 0.0, -5.0], [10.0, 10.0, 20.0]],
                     pullPointLocation=[0.0, 0.0, 0.0]))
