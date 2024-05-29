@@ -142,7 +142,9 @@ class GripperController(Sofa.Core.Controller):
         # TODO: Write a simple state machine to control the gripper
         # state machine to move gripper grasp into the right position
         # grasp the object, and then move up
-        pass
+        print(self.fingers)
+        # for i, finger in self.fingers:
+        #     breakpoint()
 
 
 def createGripper(name, parentNode):
@@ -154,14 +156,20 @@ def createGripper(name, parentNode):
         finger_rotation_y = i*120.0
 
         # Here's how you can create a single finger
-        fingers.append(createFinger("fingerName",
+        finger = createFinger("fingerName",
                     parentNode=parentNode,
                     rotation=[180.0, finger_rotation_y, 0.0],
                     translation=[0.0, 50.0, 0.0],
                     boxCoords=[[-10.0, 0.0, -10.0], [20.0, 100.0, 40.0]],
-                    pullPointLocation=[0.0, 50.0, 0.0]))
+                    pullPointLocation=[0.0, 50.0, 0.0])
+
+        fingers.append(finger)
         
         print(f"{fingerName} created")
+    
+    print("Fingers: ", fingers)
+    gripperController = GripperController(fingers=fingers)
+    parentNode.addObject(gripperController)
 
 
 def createSphere(name, parentNode):
