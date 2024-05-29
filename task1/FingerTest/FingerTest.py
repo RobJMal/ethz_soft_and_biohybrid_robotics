@@ -156,7 +156,7 @@ def createGripper(name, parentNode):
         # Here's how you can create a single finger
         fingers.append(createFinger("fingerName",
                     parentNode=parentNode,
-                    rotation=[0.0, finger_rotation_y, 0.0],
+                    rotation=[180.0, finger_rotation_y, 0.0],
                     translation=[0.0, 50.0, 0.0],
                     boxCoords=[[-10.0, 0.0, -10.0], [20.0, 100.0, 40.0]],
                     pullPointLocation=[0.0, 50.0, 0.0]))
