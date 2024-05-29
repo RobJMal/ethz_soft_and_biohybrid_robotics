@@ -164,6 +164,29 @@ def createGripper(name, parentNode):
         print(f"{fingerName} created")
 
 
+def createSphere(name, parentNode):
+    # Creating sphere to grasp     
+    sphere = parentNode.addChild(name)
+    sphere_radius = 40
+    sphere.addObject('MechanicalObject', name="mstate", template="Rigid3", translation2=[0., 100., 0.], rotation2=[0., 0., 0.], showObjectScale=sphere_radius)
+
+    # Visualization subnode for the sphere
+    sphereVisu = sphere.addChild("VisualModel")
+    sphereVisu.loader = sphereVisu.addObject('MeshOBJLoader', name="loader", filename="mesh/ball.obj")
+    sphereVisu.addObject('OglModel', name="model", src="@loader", scale3d=[sphere_radius]*3, color=[0., 1., 0.], updateNormals=False)
+    sphereVisu.addObject('RigidMapping')
+
+    #### Collision subnode for the sphere
+    collision = sphere.addChild('collision')
+    collision.addObject('MeshOBJLoader', name="loader", filename="mesh/ball.obj", triangulate="true", scale=45.0)
+    collision.addObject('MeshTopology', src="@loader")
+    collision.addObject('MechanicalObject')
+    collision.addObject('TriangleCollisionModel')
+    collision.addObject('LineCollisionModel')
+    collision.addObject('PointCollisionModel')
+    collision.addObject('RigidMapping')
+
+
 def createScene(rootNode):
     MainHeader(rootNode, gravity=[0.0, -981.0, 0.0], plugins=["SoftRobots"])
     ContactHeader(rootNode, alarmDistance=4, contactDistance=3, frictionCoef=0.08)
@@ -177,13 +200,5 @@ def createScene(rootNode):
     # Create a three-fingered gripper by applying the correct transformations
     gripper = createGripper("gripper", rootNode)
 
-    # Creating sphere to grasp     
-    sphere = rootNode.addChild("sphere")
-    sphere_radius = 40
-    sphere.addObject('MechanicalObject', name="mstate", template="Rigid3", translation2=[0., 100., 0.], rotation2=[0., 0., 0.], showObjectScale=sphere_radius)
-
-    # Visualization subnode for the sphere
-    sphereVisu = sphere.addChild("VisualModel")
-    sphereVisu.loader = sphereVisu.addObject('MeshOBJLoader', name="loader", filename="mesh/ball.obj")
-    sphereVisu.addObject('OglModel', name="model", src="@loader", scale3d=[sphere_radius]*3, color=[0., 1., 0.], updateNormals=False)
-    sphereVisu.addObject('RigidMapping')
+    # Creating sphere to grasp
+    sphere = createSphere("sphere", rootNode)
