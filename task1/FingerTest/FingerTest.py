@@ -177,22 +177,12 @@ def createScene(rootNode):
     # Create a three-fingered gripper by applying the correct transformations
     gripper = createGripper("gripper", rootNode)
 
-    # Create a sphere to grasp 
-    # sphere = rootNode.addChild("sphere")
-    # sphere_radius = 40
-    # sphere.addObject('MechanicalObject', name="mstate", template="Rigid3", translation2=[0., 0., 0.])
-    # sphere.addObject('UniformMass', totalMass=1.0)
-    # sphere.addObject('SphereCollisionModel', radius=sphere_radius)
-    # sphere.addObject('UncoupledConstraintCorrection')
-    # sphere.addObject('OglModel', color=[1.0, 1.0, 0.0, 1.0], scale3d=[sphere_radius, sphere_radius, sphere_radius])
-
-    # Creating the falling sphere object
-    
+    # Creating sphere to grasp     
     sphere = rootNode.addChild("sphere")
     sphere_radius = 40
-    sphere.addObject('MechanicalObject', name="mstate", template="Rigid3", translation2=[0., 0., 0.], rotation2=[0., 0., 0.], showObjectScale=sphere_radius)
+    sphere.addObject('MechanicalObject', name="mstate", template="Rigid3", translation2=[0., 100., 0.], rotation2=[0., 0., 0.], showObjectScale=sphere_radius)
 
-    #### Visualization subnode for the sphere
+    # Visualization subnode for the sphere
     sphereVisu = sphere.addChild("VisualModel")
     sphereVisu.loader = sphereVisu.addObject('MeshOBJLoader', name="loader", filename="mesh/ball.obj")
     sphereVisu.addObject('OglModel', name="model", src="@loader", scale3d=[sphere_radius]*3, color=[0., 1., 0.], updateNormals=False)
