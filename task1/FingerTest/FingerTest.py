@@ -157,18 +157,27 @@ def createGripper(name, parentNode):
         fingers.append(createFinger("fingerName",
                     parentNode=parentNode,
                     rotation=[0.0, finger_rotation_y, 0.0],
-                    translation=[0.0, 0.0, 0.0],
-                    boxCoords=[[-10.0, 0.0, -10.0], [20.0, 20.0, 40.0]],
-                    pullPointLocation=[0.0, 0.0, 0.0]))
+                    translation=[0.0, 50.0, 0.0],
+                    boxCoords=[[-10.0, 0.0, -10.0], [20.0, 100.0, 40.0]],
+                    pullPointLocation=[0.0, 50.0, 0.0]))
         
         print(f"{fingerName} created")
 
 
 def createSphere(name, parentNode):
-    # Creating sphere to grasp     
+    # Mechanical properties of sphere to incorporate gravity
+    totalMass = 1.0
+    volume = 1.0
+    inertiaMatrix=[1., 0., 0., 0., 1., 0., 0., 0., 1.]
+
+    # Creating sphere to grasp that falls due to gravity   
     sphere = parentNode.addChild(name)
     sphere_radius = 40
-    sphere.addObject('MechanicalObject', name="mstate", template="Rigid3", translation2=[0., 100., 0.], rotation2=[0., 0., 0.], showObjectScale=sphere_radius)
+    sphere.addObject('EulerImplicitSolver', name='odesolver')
+    sphere.addObject('CGLinearSolver', name='Solver', iterations=25, tolerance=1e-05, threshold=1e-05)
+    sphere.addObject('MechanicalObject', name="mstate", template="Rigid3", translation2=[0., -20., 0.], rotation2=[0., 0., 0.], showObjectScale=sphere_radius)
+    sphere.addObject('UniformMass', name="mass", vertexMass=[totalMass, volume, inertiaMatrix[:]])
+    sphere.addObject('UncoupledConstraintCorrection')
 
     # Visualization subnode for the sphere
     sphereVisu = sphere.addChild("VisualModel")
