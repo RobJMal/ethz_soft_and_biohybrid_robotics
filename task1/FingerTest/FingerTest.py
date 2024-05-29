@@ -106,6 +106,8 @@ def createFinger(name,
 
     elasticMeshObj.addObject(FingerController(cable=cableObj, name=name))
 
+    return fingerObj
+
 
 class FingerController(Sofa.Core.Controller):
     def __init__(self, *args, **kwargs):
@@ -167,7 +169,6 @@ def createGripper(name, parentNode):
         
         print(f"{fingerName} created")
     
-    print("Fingers: ", fingers)
     gripperController = GripperController(fingers=fingers)
     parentNode.addObject(gripperController)
 
